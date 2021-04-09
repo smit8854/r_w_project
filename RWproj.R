@@ -1,5 +1,9 @@
 vas=read.csv(file=file.choose())
+# vas -> one record per rater per sound
+
 acous=read.csv(file=file.choose())
+# acous -> one record per child per sound
+
 names(vas)[1]="ExperimentName"
 names(acous)[1]="sound"
 
@@ -9,13 +13,21 @@ names(acous)
 head(acous)
 head(vas)
 
+#standardize f3f2 per child
+acous2 <- acous %>% 
+  group_by(ChildID) %>% 
+  mutate(f3f2norm = scale(f3f2))
+
+
+
 
 #merged file
 
-va=merge(vas,acous,by=c("ChildWordKey","word"), all=TRUE)
+va=merge(vas,acous2,by=c("ChildWordKey","word"), all=TRUE)
 dim(va)
 sum(is.na(acous$ChildWordKey))
 #whats goin on with the dims?
+## there are missing child IDs???
 
 library(tidyverse)
 ggplot(data=va, aes(x=rating, color=transc))+geom_density()
@@ -196,3 +208,61 @@ va_vowel %>%
   facet_wrap(~target)
 
 
+# April 9, 2021 -----------------------------------------------------------
+
+## Goals -> 
+### (1) standardize f3-f2 difference per child, 
+#### it worked! yay! -> see lines 16-19
+
+### (2) look at standardizations by child, by experiment
+#### not sure what the hells going on. not a ton of differences.
+
+### (3) look at raters' ratings by std f3-f2 per child
+#### need to figure out which raters listened to which kid
+
+### (4) look at raters' ratings by std f3-f2 across children
+#### again, not a ton of differences
+
+### (5) see if raters calibrated to childrens' f3-f2 ranges
+#### ehhhh next time maybe
+
+
+ggplot(
+  data=(acous2 %>% filter(
+    ChildID == unique(acous2$ChildID)[22], 
+    tran == c("w", "r")
+  )), 
+  aes(x=f3f2norm, color=tran)
+) + 
+  geom_density()
+
+ggplot(
+  data=(va %>% filter(
+    ChildID == unique(acous2$ChildID)[22],
+    transc == c("r","w")
+  )),
+  aes(x=f3f2norm,y=rating)
+) + 
+  geom_density_2d()+
+  scale_x_continuous(limits=c(-2,2))+
+  scale_y_continuous(limits=c(0,1))+
+  facet_wrap(~transc)
+
+ggplot(
+  data=(va %>% filter(
+    Subject == unique(va$Subject)[42],
+ #   ChildID == unique(acous2$ChildID)[4],
+    transc == c("r","w")
+  )),
+  aes(x=f3f2norm,y=rating, color=transc)
+) + 
+  geom_density_2d()+
+#  geom_point()+geom_jitter()+
+#  geom_hex()+geom_hitter()+
+  scale_x_continuous(limits=c(-2,2))+
+  scale_y_continuous(limits=c(0,1))
+## find a better viz  
+
+
+### which kids did subject 5002 (index42) listen to?
+va %>% filter(Subject==5002) %>% select(ChildID) %>% unique()
