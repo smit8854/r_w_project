@@ -3,6 +3,12 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+
+REMEMBER!!
+
+ChildID was created in excel. To fully smooth the transition from raw PRAAT to R, write code to do that here. 
+
+
 # Import Files
 
 ```{r}
