@@ -1,0 +1,174 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Import Files
+
+```{r}
+vas <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\VAS.csv")
+```
+one record per rater per sound
+
+
+```{r}
+acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\acoustic.csv")
+```
+one record per child per sound
+
+
+## Initial processing
+
+rename columns that R/we messed up somewhere
+```{r}
+names(vas)[1] <- "ExperimentName"
+names(vas)[2] <- "Version"
+
+names(vas)[which(names(vas)=="Subject")] <- "Listener"
+
+names(acous)[1]="sound"
+```
+
+
+standardize f3f2 per child
+```{r}
+acous.orig <- acous #save original important in separate table
+
+acous <- acous.orig %>% 
+  group_by(ChildID) %>% 
+  mutate(f3f2norm = scale(f3f2))
+```
+
+
+Check file characteristics
+```{r}
+dim(vas)
+dim(acous)
+
+names(vas)
+names(acous)
+
+head(acous)
+head(vas)
+```  
+
+
+## Unique IDs
+
+### Children
+
+Verify child ID. Remember, the ChildIDs are not on the original file, they were made in excel. consider trying to pull that off in R. or at the least, verify it's been done correctly ...
+
+First, make sure each unique sound ID has the correct child ID.
+```{r}
+(acous %>% select(sound, ChildID) %>% distinct())
+```
+There are 136 total kids. Looks good. 
+
+
+Second, make there are no missing childIDs.
+```{r}
+sum(is.na(acous$ChildID))
+```
+w00t.
+
+
+
+### Adults
+
+```{r}
+table(vas$Listener)
+dim(table(vas$Listener))
+
+sum(is.na(vas$Listener))
+
+vas %>% select(Listener) %>% distinct()
+```
+
+132 adult listeners each getting approx 500 stims. + no missing. 
+
+should be 142 ... 102 from minn and 30 from wisc ??
+
+
+```{r}
+table(vas$ChildID)
+dim(table(vas$ChildID))
+sum(is.na(vas$ChildID))
+```
+148 kids ??? thought there were only 136... there should only be 136
+
+```{r}
+vas %>% select(ChildID) %>% distinct()
+acous %>% select(ChildID) %>% distinct()
+```
+Kids 17 and 22 are faux? 
+
+```{r}
+vas %>% filter(ChildID=="017L") %>% select(ChildID, Age, sex, Filename, ChildWordKey, )
+```
+
+```{r}
+table((vas %>% select(ChildID, include) %>% distinct())$include)
+```
+
+## Notes
+
+sooooooo whatever the include var is, that should match up the kids between VAS and acous. 
+
+
+# Merge
+
+```{r}
+#verify we've got all the same kids
+cbind(
+  vas %>% filter(include == "yes") %>% select(ChildID) %>% distinct(),
+  acous %>% select(ChildID) %>% distinct()
+)
+```
+
+```{r}
+rw.merge <- merge(
+  (vas %>% filter(include=="yes")),acous, 
+  by = c("ChildWordKey"),
+  all=TRUE
+)
+```
+
+```{r}
+dim(rw.merge); dim(vas)
+head(rw.merge)
+sum(is.na(rw.merge$sound))
+```
+wtf! why are dim rw.merge and dim vas not equal?
+
+```{r}
+# list of child+words that are on VAS but not acoustic file
+
+rw.merge %>% filter(is.na(sound)) %>% select(ChildWordKey) %>% distinct()
+```
+
+
+```{r}
+acous %>% filter(ChildID == "C006")
+```
+Kid 6 didn't say window ...
+
+```{r}
+vas%>% filter(ChildID == "C006", word=="window")
+```
+ ... but we've got listeners who have rated kid 6 saying window. 
+
+
+
+```{r}
+acous %>% filter(ChildID %in% (
+  rw.merge %>% filter(is.na(sound)) %>% select(ChildWordKey) %>% distinct()
+  )
+)
+```
+as expected, no acous data for some childwordkeys. 
+
+
+need to go search PRAAT for kid 6 saying window. 
+
+implications for R. The merge is fine, exclude the 12 mysterious kids from VAS before merge. previous analyses stand. 
