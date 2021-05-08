@@ -4,21 +4,24 @@ output: html_notebook
 ---
 
 
-REMEMBER!!
-
-ChildID was created in excel. To fully smooth the transition from raw PRAAT to R, write code to do that here. 
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
 
 
 # Import Files
 
 ```{r}
-vas <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\VAS.csv")
+vas <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\raw_rw_data.csv")
 ```
 one record per rater per sound
 
 
 ```{r}
-acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\acoustic.csv")
+acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\raw_acoustic_data.csv")
 ```
 one record per child per sound
 
@@ -32,8 +35,26 @@ names(vas)[2] <- "Version"
 
 names(vas)[which(names(vas)=="Subject")] <- "Listener"
 
-names(acous)[1]="sound"
+names(acous)=c("sound", "word", "test", "tran", "timeLab", "f1", "f2", "f3", "f3f2")
 ```
+
+
+create ChildWordKey in vas
+```{r}
+vas.orig <- vas
+
+vas <- vas.orig %>% mutate(ChildWordKey = sub("\\_.*", "", Filename))
+```
+
+create ChildWordKey in acous
+```{r}
+acous.orig  <- acous
+
+acous <- acous.orig %>% 
+  mutate(ChildID = sub(".*_", "", sound)) %>% #creates the ChildID
+    mutate(., ChildWordKey = paste(ChildID, test, word, sep="")) # concatenates Child, Test, and Word
+```
+
 
 
 standardize f3f2 per child
@@ -141,7 +162,7 @@ rw.merge <- merge(
 ```
 
 ```{r}
-dim(rw.merge); dim(vas)
+dim(rw.merge); dim(vas %>% filter(include=="yes"))
 head(rw.merge)
 sum(is.na(rw.merge$sound))
 ```
