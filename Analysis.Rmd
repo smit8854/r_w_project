@@ -1,0 +1,13 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Input
+```{r}
+rw.merge <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\rw_merge.csv")
+
+```
+
+
+# F2F3 for R and W
