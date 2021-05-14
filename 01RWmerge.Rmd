@@ -26,6 +26,13 @@ acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\d
 one record per child per sound
 
 
+
+```{r}
+vowel <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\target_words_vowel_type.csv")
+```
+vowel info
+
+
 ## Initial processing
 
 rename columns that R/we messed up somewhere
@@ -39,12 +46,15 @@ names(acous)=c("sound", "word", "test", "tran", "timeLab", "f1", "f2", "f3", "f3
 ```
 
 
+
+
 create ChildWordKey in vas
 ```{r}
 vas.orig <- vas
 
 vas <- vas.orig %>% mutate(ChildWordKey = sub("\\_.*", "", Filename))
 ```
+
 
 create ChildWordKey in acous
 ```{r}
@@ -65,6 +75,20 @@ acous <- acous.orig %>%
   group_by(ChildID) %>% 
   mutate(f3f2norm = scale(f3f2))
 ```
+
+
+merge vowel with acous
+```{r}
+acous.vowel <- merge(
+  acous, vowel,
+  by = c("word"),
+  all=TRUE
+)
+
+orig.acous <- acous
+acous <- acous.vowel
+```
+
 
 
 Check file characteristics
@@ -166,6 +190,8 @@ dim(rw.merge); dim(vas %>% filter(include=="yes"))
 head(rw.merge)
 sum(is.na(rw.merge$sound))
 ```
+
+
 wtf! why are dim rw.merge and dim vas not equal?
 
 ```{r}
@@ -199,3 +225,9 @@ as expected, no acous data for some childwordkeys.
 need to go search PRAAT for kid 6 saying window. 
 
 implications for R. The merge is fine, exclude the 12 mysterious kids from VAS before merge. previous analyses stand. 
+
+save as CSV
+```{r}
+write.csv(rw.merge, file=file.choose())
+```
+
