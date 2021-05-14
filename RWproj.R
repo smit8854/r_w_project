@@ -30,7 +30,8 @@ sum(is.na(acous$ChildWordKey))
 ## there are missing child IDs???
 
 library(tidyverse)
-ggplot(data=va, aes(x=rating, color=transc))+geom_density()
+ggplot(data=rw.merge, aes(x=rating, color=transc))+geom_density()+
+  scale_colour_manual(values=cbPalette) + theme_tufte()
 
 ggplot(data=(va %>% filter(transc=="r")), aes(x=rating, color=word))+geom_density()
 ggplot(data=(va %>% filter(transc=="rw")), aes(x=rating, color=word))+geom_density()

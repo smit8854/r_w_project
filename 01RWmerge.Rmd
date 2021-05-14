@@ -89,6 +89,11 @@ orig.acous <- acous
 acous <- acous.vowel
 ```
 
+export cleaned acoustic file
+```{r}
+write.csv(acous, file=file.choose())
+```
+
 
 
 Check file characteristics
