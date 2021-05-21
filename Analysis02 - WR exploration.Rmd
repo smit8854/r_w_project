@@ -22,6 +22,7 @@ library(ggplot2)
 library(tidyverse)
 library(ggthemes)
 library(ggpubr)
+library(GGally)
 ```
 
 # F2F3 for R and W
@@ -284,3 +285,54 @@ ggplot(data=(rw.merge %>% filter(transc=="r", Letter!="ei", Front.back=="front")
 
 
 
+
+
+
+
+# w production and R production
+```{r}
+rw.parcoord.transc.r <- rw.merge %>% filter(transc=="r") %>% group_by(subject) %>% summarise(mean.transc.r = mean(rating))
+rw.parcoord.transc.w <- rw.merge %>% filter(transc=="w") %>% group_by(subject) %>% summarise(mean.transc.w = mean(rating))
+rw.parcoord.transc.rw <- rw.merge %>% filter(transc=="rw") %>% group_by(subject) %>% summarise(mean.transc.rw = mean(rating))
+rw.parcoord.transc.wr <- rw.merge %>% filter(transc=="wr") %>% group_by(subject) %>% summarise(mean.transc.wr = mean(rating))
+rw.parcoord.targ.r <- rw.merge %>% filter(target=="r") %>% group_by(subject) %>% summarise(mean.targ.r = mean(rating))
+rw.parcoord.targ.w <- rw.merge %>% filter(target=="w") %>% group_by(subject) %>% summarise(mean.targ.w = mean(rating))
+
+rw.pc <-
+merge(
+merge(
+merge(
+merge(
+merge(
+  rw.parcoord.targ.r, 
+  rw.parcoord.targ.w, by="subject"), 
+  rw.parcoord.transc.r, by="subject"),
+  rw.parcoord.transc.wr, by="subject"),
+  rw.parcoord.transc.w, by="subject"),
+  rw.parcoord.transc.rw, by="subject")
+
+rw.pc2 <- rw.pc %>% mutate(goodR = as.factor((mean.targ.r<.3)*1))
+ggparcoord(rw.pc2,
+    columns = c(3,2,4,7,5,6), groupColumn = 8, scale="globalminmax"
+    ) +
+  theme_tufte()+scale_colour_manual(values=c("red", "blue"))
+```
+
+```{r}
+rw.pc.w <- rw.pc %>% mutate(goodW = as.factor(1-(mean.targ.w<.7)*1))
+ggparcoord(rw.pc.w,
+    columns = c(3,2,4,7,5,6), groupColumn = 8, scale="globalminmax"
+    ) +
+  theme_tufte()+scale_colour_manual(values=c("red", "blue"))
+```
+```{r}
+ggplot(data=rw.pc, aes(x=mean.targ.w, y=mean.targ.r))+geom_point()+
+  theme_tufte()+
+  scale_x_continuous(limits=c(0,1))+  scale_y_continuous(limits=c(0,1))
+```
+
+```{r}
+ggplot(data=rw.pc, aes(x=mean.transc.w, y=mean.transc.rw))+geom_point()+
+  theme_tufte()+
+  scale_x_continuous(limits=c(0,1))+  scale_y_continuous(limits=c(0,1))
+```

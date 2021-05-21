@@ -167,22 +167,26 @@ We're expecting ratings to change as f3f2 changes, i.e., some non-zero slope on 
 p1=ggplot(data=(rw.merge %>% filter(transc=="w")), aes(y=f3f2, x=rating)) + 
   labs(title="w") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(500,3000))
+  scale_y_continuous(limits=c(500,3000))+
+  scale_x_continuous(limits=c(0,1)) 
 
 p2=ggplot(data=(rw.merge  %>% filter(transc=="r")), aes(y=f3f2, x=rating)) + 
   labs(title="r") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(500,3000))
+  scale_y_continuous(limits=c(500,3000))+
+  scale_x_continuous(limits=c(0,1))
 
 p3=ggplot(data=(rw.merge  %>% filter(transc=="rw")), aes(y=f3f2, x=rating)) + 
   labs(title="rw") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(500,3000))
+  scale_y_continuous(limits=c(500,3000))+
+  scale_x_continuous(limits=c(0,1))
 
 p4=ggplot(data=(rw.merge  %>% filter(transc=="wr")), aes(y=f3f2, x=rating)) + 
   labs(title="wr") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(500,3000))
+  scale_y_continuous(limits=c(500,3000))+
+  scale_x_continuous(limits=c(0,1))
 ggarrange(p1,p2, p3, p4)
 ```
 
@@ -197,6 +201,7 @@ rw.merge %>%
   aes(x = rating, y = f3f2) +
   geom_density_2d() +
   scale_y_continuous(limits=c(500,3000)) +
+  scale_x_continuous(limits=c(0,1)) +
   scale_colour_manual(values=cbPalette) + theme_tufte() +
   facet_wrap(~transc, scales = "free")
 ```
@@ -208,7 +213,7 @@ rw.merge %>%
   aes(x = f3f2, color = transc) +
   geom_density() +
   scale_colour_manual(values=cbPalette) + theme_tufte() +
-  scale_x_continuous(limits=c(500,3000))
+  scale_x_continuous(limits=c(0,1))
 ```
 Looks like very low f3f2 are more likely to be R, very high are W, in the middle, no difference. 
 
@@ -219,19 +224,23 @@ What about just for f3?
 f1=ggplot(data=(rw.merge %>% filter(transc=="w")), aes(y=f3, x=rating)) + 
   labs(title="w") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(2000,5000))
+  scale_y_continuous(limits=c(2000,5000))+
+  scale_x_continuous(limits=c(0,1))
 f2=ggplot(data=(rw.merge %>% filter(transc=="r")), aes(y=f3, x=rating)) + 
   labs(title="r") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(2000,5000))
+  scale_y_continuous(limits=c(2000,5000))+
+  scale_x_continuous(limits=c(0,1))
 f3=ggplot(data=(rw.merge %>% filter(transc=="rw")), aes(y=f3, x=rating)) + 
   labs(title="rw") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(2000,5000))
+  scale_y_continuous(limits=c(2000,5000))+
+  scale_x_continuous(limits=c(0,1))
 f4=ggplot(data=(rw.merge %>% filter(transc=="wr")), aes(y=f3, x=rating)) + 
   labs(title="wr") + 
   geom_density_2d() + 
-  scale_y_continuous(limits=c(2000,5000))
+  scale_y_continuous(limits=c(2000,5000))+
+  scale_x_continuous(limits=c(0,1))
 ggarrange(f1, f2, f3, f4)
 ```
 F3 distances within a transcription are not related to the rating. But, super low f3 is more likely to be r than the others. 
