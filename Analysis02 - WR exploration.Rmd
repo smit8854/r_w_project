@@ -1,0 +1,286 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Input
+```{r}
+rw.merge <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\rw_merge.csv")
+acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\acoustic.csv")
+```
+
+child age
+```{r}
+acous$ChildAge <- as.numeric(substr(acous$ChildID, start=5, stop=6))
+rw.merge$ChildAge <- as.numeric(substr(rw.merge$ChildID, start=5, stop=6))
+```
+
+libraries
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+library(ggplot2)
+library(tidyverse)
+library(ggthemes)
+library(ggpubr)
+```
+
+# F2F3 for R and W
+
+How to scale? 
+- Account for age
+- scale F3 F2 separately, then calculate their difference
+
+How should we account for age? 
+
+## f2 by age for /r/ and /w/
+```{r}
+ggplot(
+  data=(acous %>% filter(
+    tran == c("$r", "r", "$w", "w")
+  )), 
+  aes(y=f2, x=ChildAge, color=tran)
+) + 
+  scale_colour_manual(values=cbPalette) + theme_tufte()+
+  geom_point()+
+  geom_smooth(method=loess)
+```
+
+## f3 by age for /r/ and /w/
+```{r}
+ggplot(
+  data=(acous %>% filter(
+    tran == c("$r", "r", "$w", "w")
+  )), 
+  aes(y=f3, x=ChildAge, color=tran)
+) + 
+  scale_colour_manual(values=cbPalette) + theme_tufte()+
+  geom_point()+
+  geom_smooth(method=loess)
+```
+The f3 drops for r, its like a refinement. Or for younger kids there's a contributor, or a proxy, or another cue. 
+
+Is the other cue vowels? 
+
+### f3 by age for /r/ by vowel
+```{r}
+ggplot(
+  data=(acous %>% filter(
+    tran == c("r")
+  )), 
+  aes(y=f3, x=ChildAge, color=Letter)
+) + 
+  scale_colour_manual(values=cbPalette) + theme_tufte()+
+  geom_point()+
+  geom_smooth(method=loess, alpha=.1)
+```
+Nope.
+
+## f3f2 difference by age for /r/
+```{r}
+ggplot(
+  data=(acous %>% filter(
+    tran == c("$r", "r", "$w", "w")
+  )), 
+  aes(y=f3f2, x=ChildAge, color=tran)
+) + 
+  scale_colour_manual(values=cbPalette) + theme_tufte()+
+  geom_point()+
+  geom_smooth(method=loess)
+```
+
+
+
+
+## scaled f2f3 by transcription
+```{r}
+ggplot(
+  data=(acous %>% filter(
+    #ChildID == unique(acous$ChildID)[22], 
+    tran == c("w", "r")
+  )), 
+  aes(x=f3f2norm, color=tran)
+) + 
+  geom_density() + 
+    scale_colour_manual(values=cbPalette) + theme_tufte()
+```
+
+# Adult Listener Ratings
+```{r}
+ggplot(data=rw.merge, aes(x=rating, color=transc))+geom_density(size=2)+
+  scale_colour_manual(values=cbPalette) + theme_tufte()
+```
+The wr line is really flat ... which means the adult listeners ratings of wr transcriptions is ... suspect/unreliable. 
+
+You have w's, and you have r's, and if you have even a  little bit of rhoticity, then people perceive it towards the /r/ side. /r/ bias. 
+
+Need to check the method of transcription here, as there's some debate about how to group the transcriptions. People may perceive this is just R, W, or a half r, with some rhoticity but not full on. What does "wr" mean?
+
+R makes sense. W makes sense. RW also makes sense. It's an R with a pinch of W. People aren't quite as sure with RW as the R, but it's pretty R like. The professional said this is neither r nor w but more r like, but the adult rates pushed them strongly towards R, but not fully so. 
+
+## Target R/W and Produced R/W 
+
+Adult rating by transcription by target word
+
+$r is target w but sounds like r
+$w is target r but sounds like w
+
+```{r}
+ggplot(data=(rw.merge %>% filter(!is.na(target))), aes(x=rating, color=transc))+geom_density(size=2)+
+  scale_colour_manual(values=cbPalette) + theme_tufte()+
+facet_wrap(~target)
+```
+No differences by target word. 
+
+
+
+Is there a difference between r and $r? or w and $w? or r and $w vs. w and $r? 
+```{r}
+ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("$r", "r", "$w", "w"))), aes(x=rating, color=tran))+geom_density(size=2)+
+  scale_colour_manual(values=cbPalette) + theme_tufte() 
+```
+This speaks to what Ben was investigating in his paper - is there a hidden difference in r productions based on target words? Maybe ever so slightly. 
+
+Is there a difference in $r by age? 
+```{r}
+ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("$r", "$r:w"))), aes(x=ChildAge, y=rating, color=tran))+
+  geom_point()+geom_smooth(method=lm)+
+  scale_colour_manual(values=cbPalette) + theme_tufte() 
+```
+
+Is there a difference in $w by age? 
+```{r}
+ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("$w"))), aes(x=as.factor(ChildAge), y=rating, color=tran))+
+#  geom_point()+geom_smooth(method=lm)+
+  geom_violin()+
+  scale_colour_manual(values=cbPalette) + theme_tufte() 
+```
+
+No. It seems age is only helpful when considering within subject development, not across all participants in a single time point study. 
+
+## F3F2 distance and Rating
+
+Contour plots for f3f2 distance and rating by transcription. 
+
+We're expecting ratings to change as f3f2 changes, i.e., some non-zero slope on the central axis.
+
+```{r}
+p1=ggplot(data=(rw.merge %>% filter(transc=="w")), aes(y=f3f2, x=rating)) + 
+  labs(title="w") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(500,3000))
+
+p2=ggplot(data=(rw.merge  %>% filter(transc=="r")), aes(y=f3f2, x=rating)) + 
+  labs(title="r") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(500,3000))
+
+p3=ggplot(data=(rw.merge  %>% filter(transc=="rw")), aes(y=f3f2, x=rating)) + 
+  labs(title="rw") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(500,3000))
+
+p4=ggplot(data=(rw.merge  %>% filter(transc=="wr")), aes(y=f3f2, x=rating)) + 
+  labs(title="wr") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(500,3000))
+ggarrange(p1,p2, p3, p4)
+```
+
+All these center axes look horizontal .... f3f2 isn't related to rating? Perhaps, with w and rw, it's at least related to variation. 
+
+
+plot contours of ratings that are strictly r and w to look at f3f2 diff
+```{r}
+rw.merge %>% 
+  filter(transc == "r" & rating < 0.125 | transc == "w" & rating > 0.875) %>% 
+  ggplot() +
+  aes(x = rating, y = f3f2) +
+  geom_density_2d() +
+  scale_y_continuous(limits=c(500,3000)) +
+  scale_colour_manual(values=cbPalette) + theme_tufte() +
+  facet_wrap(~transc, scales = "free")
+```
+
+```{r}
+rw.merge %>% 
+  filter(transc == "r" & rating < 0.125 | transc == "w" & rating > 0.875) %>% 
+  ggplot() +
+  aes(x = f3f2, color = transc) +
+  geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte() +
+  scale_x_continuous(limits=c(500,3000))
+```
+Looks like very low f3f2 are more likely to be R, very high are W, in the middle, no difference. 
+
+### F3 only
+
+What about just for f3? 
+```{r}
+f1=ggplot(data=(rw.merge %>% filter(transc=="w")), aes(y=f3, x=rating)) + 
+  labs(title="w") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(2000,5000))
+f2=ggplot(data=(rw.merge %>% filter(transc=="r")), aes(y=f3, x=rating)) + 
+  labs(title="r") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(2000,5000))
+f3=ggplot(data=(rw.merge %>% filter(transc=="rw")), aes(y=f3, x=rating)) + 
+  labs(title="rw") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(2000,5000))
+f4=ggplot(data=(rw.merge %>% filter(transc=="wr")), aes(y=f3, x=rating)) + 
+  labs(title="wr") + 
+  geom_density_2d() + 
+  scale_y_continuous(limits=c(2000,5000))
+ggarrange(f1, f2, f3, f4)
+```
+F3 distances within a transcription are not related to the rating. But, super low f3 is more likely to be r than the others. 
+
+
+What about f distances by transcription? 
+```{r}
+q1=ggplot(data=(rw.merge %>% filter(!is.na(transc))), aes(x=f3, color=transc))+geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte() 
+q2=ggplot(data=(rw.merge %>% filter(!is.na(transc))), aes(x=f2, color=transc))+geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte() +
+    scale_x_continuous(limits=c(500,4000))
+q3=ggplot(data=(rw.merge %>% filter(!is.na(transc))), aes(x=f1, color=transc))+geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte()  +
+    scale_x_continuous(limits=c(0,2000))
+q4=ggplot(data=(rw.merge %>% filter(!is.na(transc))), aes(x=f3f2, color=transc))+geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte() 
+ggarrange(q1, q2, q3, q4)
+```
+No clear differences.... Maybe some slight ones, like wr for f3f2. Or w for f2. Or r for f3. 
+
+### Vowel?
+
+Front/Back Vowel influence on F2? 
+```{r}
+ggplot(data=(rw.merge %>% filter(Front.back==c("back","front"), !is.na(transc))), aes(x=f2, color=Front.back))+geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte() +
+  facet_wrap(~transc)+
+  scale_x_continuous(limits=c(0,4000))
+
+```
+Says something about how the r and w is produced independently of the vowel. 
+
+Vowel letter influence on F3F2, for R, back vowels? 
+```{r}
+ggplot(data=(rw.merge %>% filter(transc=="r", Letter!="ei", Front.back=="back")), aes(x=f3f2, color=Letter))+geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte() +
+  facet_wrap(~transc)+
+  scale_x_continuous(limits=c(0,3000))
+```
+
+Vowel letter influence on F3F2, for R, front vowels? 
+```{r}
+ggplot(data=(rw.merge %>% filter(transc=="r", Letter!="ei", Front.back=="front")), aes(x=f3f2, color=Letter))+geom_density() +
+  scale_colour_manual(values=cbPalette) + theme_tufte() +
+  facet_wrap(~transc)+
+  scale_x_continuous(limits=c(0,3000))
+```
+
+
+
+
