@@ -1,0 +1,106 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+rw.merge <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\rw_merge.csv")
+acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\acoustic.csv")
+```
+
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(gtheory)
+library(lme4)
+library(car)
+library(MuMIn)
+```
+
+```{r}
+rw.merge %>% 
+  mutate(
+    R.Indicator=1*(transc=="r"),
+    R.plus.Indicator=1*(tran %in% c("r", "$r", "$r:w")), 
+    Target=as.factor(target),
+    Transcription=as.factor(transc),
+    Rater=as.factor(Listener), 
+    Child=as.factor(subject),
+    Word=as.factor(word.x)
+  ) %>%
+  select(
+    rating, 
+    R.Indicator, 
+    R.plus.Indicator,
+    Target, 
+    Transcription, 
+    Rater, 
+    f3f2, 
+    f3, 
+    Child, 
+    Word
+  ) %>% 
+  filter(!is.na(rating)) -> 
+    rw.clean
+```
+
+# Log Binomial Mixed Effects Model for Transcription of /R/ by F3f2
+
+```{r}
+r.glmer.logbin.mdl.base <- glmer(
+  R.Indicator ~ 
+    I(scale(f3f2)) + (1|Child)
+  , 
+  data = rw.clean,
+  family = poisson(link="log")
+)
+
+# Type 3 SS
+Anova(r.glmer.logbin.mdl.base,Type="III")
+
+
+# regression coefficients
+summary(r.glmer.logbin.mdl.base)
+r.squaredGLMM(r.glmer.logbin.mdl.base)
+r.squaredLR(r.glmer.logbin.mdl.base)
+```
+
+# Log Binomial Mixed Effects Model for Transcription of /R/ by Rating
+
+```{r}
+r.glmer.logbin.mdl.rating <- glmer(
+  R.Indicator ~ 
+    rating + (1|Child)
+  , 
+  data = rw.clean,
+  family = poisson(link="log")
+)
+
+# Type 3 SS
+Anova(r.glmer.logbin.mdl.rating,Type="III")
+
+
+# regression coefficients
+summary(r.glmer.logbin.mdl.rating)
+r.squaredGLMM(r.glmer.logbin.mdl.rating)
+r.squaredLR(r.glmer.logbin.mdl.rating)
+```
+
+
+# Linear Mixed Effects Model for Ratings
+```{r}
+lmer(data = rw.gt, formula = "rating ~ f3f2 + (1|Child)") -> rw.MEmodel
+summary(rw.MEmodel)
+r.squaredLR(rw.MEmodel)
+```
+
+# G Theory
+```{r}
+gtheory::gstudy(data = rw.clean, formula = "rating ~ f3f2 + (1|Rater) + (1|Child)")
+```
+
+```{r}
+gtheory::gstudy(data = rw.clean, formula = "R.Indicator ~ f3f2 + (1|Rater) + (1|Child)")
+```
+
+
