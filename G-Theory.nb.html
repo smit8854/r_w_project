@@ -1796,10 +1796,30 @@ acous &lt;- read.csv(&quot;C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_pr
 <h1>Log Binomial Mixed Effects Model for Transcription of /R/ by F3f2</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyByZWdyZXNzaW9uIGNvZWZmaWNpZW50c1xuc3VtbWFyeShyLmdsbWVyLmxvZ2Jpbi5tZGwuYmFzZSlcblxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuci5nbG1lci5sb2diaW4ubWRsLmJhc2UgPC0gZ2xtZXIoXG4gIFIuSW5kaWNhdG9yIH4gXG4gICAgSShzY2FsZShmM2YyKSkgKyAoMXxDaGlsZClcbiAgLCBcbiAgZGF0YSA9IHJ3LmNsZWFuLFxuICBmYW1pbHkgPSBwb2lzc29uKGxpbms9XCJsb2dcIilcbilcblxuIyBUeXBlIDMgU1NcbkFub3ZhKHIuZ2xtZXIubG9nYmluLm1kbC5iYXNlLFR5cGU9XCJJSUlcIilcbmBgYCJ9 -->
+<pre class="r"><code>r.glmer.logbin.mdl.base &lt;- glmer(
+  R.Indicator ~ 
+    I(scale(f3f2)) + (1|Child)
+  , 
+  data = rw.clean,
+  family = poisson(link=&quot;log&quot;)
+)
+
+# Type 3 SS
+Anova(r.glmer.logbin.mdl.base,Type=&quot;III&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQW5hbHlzaXMgb2YgRGV2aWFuY2UgVGFibGUgKFR5cGUgSUkgV2FsZCBjaGlzcXVhcmUgdGVzdHMpXG5cblJlc3BvbnNlOiBSLkluZGljYXRvclxuICAgICAgICAgICAgICAgIENoaXNxIERmIFByKD5DaGlzcSkgICAgXG5JKHNjYWxlKGYzZjIpKSAxNjIuNTkgIDEgIDwgMi4yZS0xNiAqKipcbi0tLVxuU2lnbmlmLiBjb2RlczogIDAg4oCYKioq4oCZIDAuMDAxIOKAmCoq4oCZIDAuMDEg4oCYKuKAmSAwLjA1IOKAmC7igJkgMC4xIOKAmCDigJkgMVxuIn0= -->
+<pre><code>Analysis of Deviance Table (Type II Wald chisquare tests)
+
+Response: R.Indicator
+                Chisq Df Pr(&gt;Chisq)    
+I(scale(f3f2)) 162.59  1  &lt; 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyByZWdyZXNzaW9uIGNvZWZmaWNpZW50c1xuc3VtbWFyeShyLmdsbWVyLmxvZ2Jpbi5tZGwuYmFzZSlcbmBgYCJ9 -->
 <pre class="r"><code># regression coefficients
-summary(r.glmer.logbin.mdl.base)
-</code></pre>
+summary(r.glmer.logbin.mdl.base)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiR2VuZXJhbGl6ZWQgbGluZWFyIG1peGVkIG1vZGVsIGZpdCBieSBtYXhpbXVtIGxpa2VsaWhvb2QgKExhcGxhY2UgQXBwcm94aW1hdGlvbikgWydnbG1lck1vZCddXG4gRmFtaWx5OiBwb2lzc29uICAoIGxvZyApXG5Gb3JtdWxhOiBSLkluZGljYXRvciB+IEkoc2NhbGUoZjNmMikpICsgKDEgfCBDaGlsZClcbiAgIERhdGE6IHJ3LmNsZWFuXG5cbiAgICAgQUlDICAgICAgQklDICAgbG9nTGlrIGRldmlhbmNlIGRmLnJlc2lkIFxuIDUwODg2LjEgIDUwOTEzLjYgLTI1NDQwLjAgIDUwODgwLjEgICAgNzExMTQgXG5cblNjYWxlZCByZXNpZHVhbHM6IFxuICAgIE1pbiAgICAgIDFRICBNZWRpYW4gICAgICAzUSAgICAgTWF4IFxuLTAuODg0MCAtMC40NDUxIC0wLjAxNTkgLTAuMDExOCAgNC43ODg0IFxuXG5SYW5kb20gZWZmZWN0czpcbiBHcm91cHMgTmFtZSAgICAgICAgVmFyaWFuY2UgU3RkLkRldi5cbiBDaGlsZCAgKEludGVyY2VwdCkgMjIuMzggICAgNC43MzEgICBcbk51bWJlciBvZiBvYnM6IDcxMTE3LCBncm91cHM6ICBDaGlsZCwgMTM1XG5cbkZpeGVkIGVmZmVjdHM6XG4gICAgICAgICAgICAgICAgRXN0aW1hdGUgU3RkLiBFcnJvciB6IHZhbHVlIFByKD58enwpICAgIFxuKEludGVyY2VwdCkgICAgLTUuODYwNDA0ICAgMC41Mzk2MjIgIC0xMC44NiAgIDwyZS0xNiAqKipcbkkoc2NhbGUoZjNmMikpIC0wLjEyMTgwNSAgIDAuMDA5NTUzICAtMTIuNzUgICA8MmUtMTYgKioqXG4tLS1cblNpZ25pZi4gY29kZXM6ICAwIOKAmCoqKuKAmSAwLjAwMSDigJgqKuKAmSAwLjAxIOKAmCrigJkgMC4wNSDigJgu4oCZIDAuMSDigJgg4oCZIDFcblxuQ29ycmVsYXRpb24gb2YgRml4ZWQgRWZmZWN0czpcbiAgICAgICAgICAgIChJbnRyKVxuSShzY2woZjMyKSkgMC4wMDEgXG4ifQ== -->
 <pre><code>Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) [&#39;glmerMod&#39;]
@@ -1830,6 +1850,26 @@ Correlation of Fixed Effects:
             (Intr)
 I(scl(f32)) 0.001 </code></pre>
 <!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuci5zcXVhcmVkR0xNTShyLmdsbWVyLmxvZ2Jpbi5tZGwuYmFzZSlcbmBgYCJ9 -->
+<pre class="r"><code>r.squaredGLMM(r.glmer.logbin.mdl.base)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJ3Iuc3F1YXJlZEdMTU0nIG5vdyBjYWxjdWxhdGVzIGEgcmV2aXNlZCBzdGF0aXN0aWMuIFNlZSB0aGUgaGVscCBwYWdlLlRoZSBudWxsIG1vZGVsIGlzIGNvcnJlY3Qgb25seSBpZiBhbGwgdmFyaWFibGVzIHVzZWQgYnkgdGhlIG9yaWdpbmFsIG1vZGVsIHJlbWFpbiB1bmNoYW5nZWQuXG4ifQ== -->
+<pre><code>&#39;r.squaredGLMM&#39; now calculates a revised statistic. See the help page.The null model is correct only if all variables used by the original model remain unchanged.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICAgICAgIFIybSAgICAgICBSMmNcbmRlbHRhICAgICAwLjAwMDY2MjQwODUgMC45OTk4MjU4XG5sb2dub3JtYWwgMC4wMDA2NjI0MDg3IDAuOTk5ODI2MlxudHJpZ2FtbWEgIDAuMDAwNjYyNDA4MiAwLjk5OTgyNTVcbiJ9 -->
+<pre><code>                   R2m       R2c
+delta     0.0006624085 0.9998258
+lognormal 0.0006624087 0.9998262
+trigamma  0.0006624082 0.9998255</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuci5zcXVhcmVkTFIoci5nbG1lci5sb2diaW4ubWRsLmJhc2UpXG5gYGAifQ== -->
+<pre class="r"><code>r.squaredLR(r.glmer.logbin.mdl.base)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMjQzODYwOVxuYXR0cigsXCJhZGouci5zcXVhcmVkXCIpXG5bMV0gMC4zODY5MTc0XG4ifQ== -->
+<pre><code>[1] 0.2438609
+attr(,&quot;adj.r.squared&quot;)
+[1] 0.3869174</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1837,10 +1877,10 @@ I(scl(f32)) 0.001 </code></pre>
 <h1>Log Binomial Mixed Effects Model for Transcription of /R/ by Rating</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuci5nbG1lci5sb2diaW4ubWRsLnJhdGluZyA8LSBnbG1lcihcbiAgUi5JbmRpY2F0b3IgfiBcbiAgICByYXRpbmcgKyAoMXxDaGlsZClcbiAgLCBcbiAgZGF0YSA9IHJ3LmNsZWFuLFxuICBmYW1pbHkgPSBwb2lzc29uKGxpbms9XCJsb2dcIilcbilcblxuIyBUeXBlIDMgU1NcbkFub3ZhKHIuZ2xtZXIubG9nYmluLm1kbC5yYXRpbmcsVHlwZT1cIklJSVwiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuci5nbG1lci5sb2diaW4ubWRsLnJhdGluZyA8LSBnbG1lcihcbiAgUi5JbmRpY2F0b3IgfiBcbiAgICByYXRpbmcgKyAoMXxDaGlsZCkgKyAoMXxSYXRlcilcbiAgLCBcbiAgZGF0YSA9IHJ3LmNsZWFuLFxuICBmYW1pbHkgPSBwb2lzc29uKGxpbms9XCJsb2dcIilcbilcblxuIyBUeXBlIDMgU1NcbkFub3ZhKHIuZ2xtZXIubG9nYmluLm1kbC5yYXRpbmcsVHlwZT1cIklJSVwiKVxuYGBgIn0= -->
 <pre class="r"><code>r.glmer.logbin.mdl.rating &lt;- glmer(
   R.Indicator ~ 
-    rating + (1|Child)
+    rating + (1|Child) + (1|Rater)
   , 
   data = rw.clean,
   family = poisson(link=&quot;log&quot;)
@@ -1849,12 +1889,12 @@ I(scl(f32)) 0.001 </code></pre>
 # Type 3 SS
 Anova(r.glmer.logbin.mdl.rating,Type=&quot;III&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQW5hbHlzaXMgb2YgRGV2aWFuY2UgVGFibGUgKFR5cGUgSUkgV2FsZCBjaGlzcXVhcmUgdGVzdHMpXG5cblJlc3BvbnNlOiBSLkluZGljYXRvclxuICAgICAgICBDaGlzcSBEZiBQcig+Q2hpc3EpICAgIFxucmF0aW5nIDYxNTguMiAgMSAgPCAyLjJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiQW5hbHlzaXMgb2YgRGV2aWFuY2UgVGFibGUgKFR5cGUgSUkgV2FsZCBjaGlzcXVhcmUgdGVzdHMpXG5cblJlc3BvbnNlOiBSLkluZGljYXRvclxuICAgICAgICBDaGlzcSBEZiBQcig+Q2hpc3EpICAgIFxucmF0aW5nIDU3NTYuOCAgMSAgPCAyLjJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG4ifQ== -->
 <pre><code>Analysis of Deviance Table (Type II Wald chisquare tests)
 
 Response: R.Indicator
         Chisq Df Pr(&gt;Chisq)    
-rating 6158.2  1  &lt; 2.2e-16 ***
+rating 5756.8  1  &lt; 2.2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</code></pre>
 <!-- rnb-output-end -->
@@ -1862,54 +1902,55 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 <pre class="r"><code># regression coefficients
 summary(r.glmer.logbin.mdl.rating)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiR2VuZXJhbGl6ZWQgbGluZWFyIG1peGVkIG1vZGVsIGZpdCBieSBtYXhpbXVtIGxpa2VsaWhvb2QgKExhcGxhY2UgQXBwcm94aW1hdGlvbikgWydnbG1lck1vZCddXG4gRmFtaWx5OiBwb2lzc29uICAoIGxvZyApXG5Gb3JtdWxhOiBSLkluZGljYXRvciB+IHJhdGluZyArICgxIHwgQ2hpbGQpXG4gICBEYXRhOiBydy5jbGVhblxuXG4gICAgIEFJQyAgICAgIEJJQyAgIGxvZ0xpayBkZXZpYW5jZSBkZi5yZXNpZCBcbiA0MjQwNy44ICA0MjQzNS40IC0yMTIwMC45ICA0MjQwMS44ICAgIDcyNDA5IFxuXG5TY2FsZWQgcmVzaWR1YWxzOiBcbiAgICBNaW4gICAgICAxUSAgTWVkaWFuICAgICAgM1EgICAgIE1heCBcbi0xLjIwMzAgLTAuMjMyMiAtMC4wMTYwIC0wLjAwODUgMTEuOTk1OSBcblxuUmFuZG9tIGVmZmVjdHM6XG4gR3JvdXBzIE5hbWUgICAgICAgIFZhcmlhbmNlIFN0ZC5EZXYuXG4gQ2hpbGQgIChJbnRlcmNlcHQpIDE3Ljg1ICAgIDQuMjI1ICAgXG5OdW1iZXIgb2Ygb2JzOiA3MjQxMiwgZ3JvdXBzOiAgQ2hpbGQsIDEzNlxuXG5GaXhlZCBlZmZlY3RzOlxuICAgICAgICAgICAgRXN0aW1hdGUgU3RkLiBFcnJvciB6IHZhbHVlIFByKD58enwpICAgIFxuKEludGVyY2VwdCkgLTQuMjUwOTIgICAgMC41MTU1MyAgLTguMjQ2ICAgPDJlLTE2ICoqKlxucmF0aW5nICAgICAgLTMuMjIwNjYgICAgMC4wNDEwNCAtNzguNDc0ICAgPDJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cbkNvcnJlbGF0aW9uIG9mIEZpeGVkIEVmZmVjdHM6XG4gICAgICAgKEludHIpXG5yYXRpbmcgLTAuMDMxXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiR2VuZXJhbGl6ZWQgbGluZWFyIG1peGVkIG1vZGVsIGZpdCBieSBtYXhpbXVtIGxpa2VsaWhvb2QgKExhcGxhY2UgQXBwcm94aW1hdGlvbikgWydnbG1lck1vZCddXG4gRmFtaWx5OiBwb2lzc29uICAoIGxvZyApXG5Gb3JtdWxhOiBSLkluZGljYXRvciB+IHJhdGluZyArICgxIHwgQ2hpbGQpICsgKDEgfCBSYXRlcilcbiAgIERhdGE6IHJ3LmNsZWFuXG5cbiAgICAgQUlDICAgICAgQklDICAgbG9nTGlrIGRldmlhbmNlIGRmLnJlc2lkIFxuIDQyMzE5LjAgIDQyMzU1LjcgLTIxMTU1LjUgIDQyMzExLjAgICAgNzI0MDggXG5cblNjYWxlZCByZXNpZHVhbHM6IFxuICAgIE1pbiAgICAgIDFRICBNZWRpYW4gICAgICAzUSAgICAgTWF4IFxuLTEuMjM0NiAtMC4yMjMyIC0wLjAxNjEgLTAuMDA4MSAxMi41NzI5IFxuXG5SYW5kb20gZWZmZWN0czpcbiBHcm91cHMgTmFtZSAgICAgICAgVmFyaWFuY2UgU3RkLkRldi5cbiBDaGlsZCAgKEludGVyY2VwdCkgMTcuNjkwNTQgNC4yMDYwICBcbiBSYXRlciAgKEludGVyY2VwdCkgIDAuMDE5MDMgMC4xMzc5ICBcbk51bWJlciBvZiBvYnM6IDcyNDEyLCBncm91cHM6ICBDaGlsZCwgMTM2OyBSYXRlciwgMTMyXG5cbkZpeGVkIGVmZmVjdHM6XG4gICAgICAgICAgICBFc3RpbWF0ZSBTdGQuIEVycm9yIHogdmFsdWUgUHIoPnx6fCkgICAgXG4oSW50ZXJjZXB0KSAtNC4xOTM5OSAgICAwLjUxMTI3ICAtOC4yMDMgMi4zNGUtMTYgKioqXG5yYXRpbmcgICAgICAtMy4zNTUzOSAgICAwLjA0NDIyIC03NS44NzQgIDwgMmUtMTYgKioqXG4tLS1cblNpZ25pZi4gY29kZXM6ICAwIOKAmCoqKuKAmSAwLjAwMSDigJgqKuKAmSAwLjAxIOKAmCrigJkgMC4wNSDigJgu4oCZIDAuMSDigJgg4oCZIDFcblxuQ29ycmVsYXRpb24gb2YgRml4ZWQgRWZmZWN0czpcbiAgICAgICAoSW50cilcbnJhdGluZyAtMC4wMzNcbiJ9 -->
 <pre><code>Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) [&#39;glmerMod&#39;]
  Family: poisson  ( log )
-Formula: R.Indicator ~ rating + (1 | Child)
+Formula: R.Indicator ~ rating + (1 | Child) + (1 | Rater)
    Data: rw.clean
 
      AIC      BIC   logLik deviance df.resid 
- 42407.8  42435.4 -21200.9  42401.8    72409 
+ 42319.0  42355.7 -21155.5  42311.0    72408 
 
 Scaled residuals: 
     Min      1Q  Median      3Q     Max 
--1.2030 -0.2322 -0.0160 -0.0085 11.9959 
+-1.2346 -0.2232 -0.0161 -0.0081 12.5729 
 
 Random effects:
  Groups Name        Variance Std.Dev.
- Child  (Intercept) 17.85    4.225   
-Number of obs: 72412, groups:  Child, 136
+ Child  (Intercept) 17.69054 4.2060  
+ Rater  (Intercept)  0.01903 0.1379  
+Number of obs: 72412, groups:  Child, 136; Rater, 132
 
 Fixed effects:
             Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept) -4.25092    0.51553  -8.246   &lt;2e-16 ***
-rating      -3.22066    0.04104 -78.474   &lt;2e-16 ***
+(Intercept) -4.19399    0.51127  -8.203 2.34e-16 ***
+rating      -3.35539    0.04422 -75.874  &lt; 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Correlation of Fixed Effects:
        (Intr)
-rating -0.031</code></pre>
+rating -0.033</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuci5zcXVhcmVkR0xNTShyLmdsbWVyLmxvZ2Jpbi5tZGwucmF0aW5nKVxuYGBgIn0= -->
 <pre class="r"><code>r.squaredGLMM(r.glmer.logbin.mdl.rating)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiVGhlIG51bGwgbW9kZWwgaXMgY29ycmVjdCBvbmx5IGlmIGFsbCB2YXJpYWJsZXMgdXNlZCBieSB0aGUgb3JpZ2luYWwgbW9kZWwgcmVtYWluIHVuY2hhbmdlZC5cbiJ9 -->
-<pre><code>The null model is correct only if all variables used by the original model remain unchanged.</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiVGhlIG51bGwgbW9kZWwgaXMgY29ycmVjdCBvbmx5IGlmIGFsbCB2YXJpYWJsZXMgdXNlZCBieSB0aGUgb3JpZ2luYWwgbW9kZWwgcmVtYWluIHVuY2hhbmdlZC5ib3VuZGFyeSAoc2luZ3VsYXIpIGZpdDogc2VlID9pc1Npbmd1bGFyXG4ifQ== -->
+<pre><code>The null model is correct only if all variables used by the original model remain unchanged.boundary (singular) fit: see ?isSingular</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICAgICBSMm0gICAgICAgUjJjXG5kZWx0YSAgICAgMC4wNTM5MjM3NyAwLjk5OTc5MzNcbmxvZ25vcm1hbCAwLjA1MzkyMzc5IDAuOTk5NzkzN1xudHJpZ2FtbWEgIDAuMDUzOTIzNzQgMC45OTk3OTI5XG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgICAgICBSMm0gICAgICAgUjJjXG5kZWx0YSAgICAgMC4wNTg3MDA4MyAwLjk5OTc5MjhcbmxvZ25vcm1hbCAwLjA1ODcwMDg2IDAuOTk5NzkzMlxudHJpZ2FtbWEgIDAuMDU4NzAwODEgMC45OTk3OTI0XG4ifQ== -->
 <pre><code>                 R2m       R2c
-delta     0.05392377 0.9997933
-lognormal 0.05392379 0.9997937
-trigamma  0.05392374 0.9997929</code></pre>
+delta     0.05870083 0.9997928
+lognormal 0.05870086 0.9997932
+trigamma  0.05870081 0.9997924</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuci5zcXVhcmVkTFIoci5nbG1lci5sb2diaW4ubWRsLnJhdGluZylcbmBgYCJ9 -->
 <pre class="r"><code>r.squaredLR(r.glmer.logbin.mdl.rating)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMzI0MDM1MlxuYXR0cigsXCJhZGouci5zcXVhcmVkXCIpXG5bMV0gMC41MTk1OTY3XG4ifQ== -->
-<pre><code>[1] 0.3240352
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMzI0ODgyN1xuYXR0cigsXCJhZGouci5zcXVhcmVkXCIpXG5bMV0gMC41MjA5NTU4XG4ifQ== -->
+<pre><code>[1] 0.3248827
 attr(,&quot;adj.r.squared&quot;)
-[1] 0.5195967</code></pre>
+[1] 0.5209558</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1997,11 +2038,16 @@ attr(,&quot;class&quot;)
 [1] &quot;gstudy&quot; &quot;list&quot;  </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ3RoZW9yeTo6Z3N0dWR5KGRhdGEgPSBydy5jbGVhbiwgZm9ybXVsYSA9IFwiUi5JbmRpY2F0b3IgfiByYXRpbmcgKyAoMXxSYXRlcikgKyAoMXxDaGlsZClcIilcbmBgYCJ9 -->
+<pre class="r"><code>gtheory::gstudy(data = rw.clean, formula = &quot;R.Indicator ~ rating + (1|Rater) + (1|Child)&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCnJ3Lm1lcmdlIDwtIHJlYWQuY3N2KCJDOlxcVXNlcnNcXHRlbm5pXFxPbmVEcml2ZVxcRG9jdW1lbnRzXFxHaXRIdWJcXHJfd19wcm9qZWN0XFxkYXRhXFxyd19tZXJnZS5jc3YiKQ0KYWNvdXMgPC0gcmVhZC5jc3YoIkM6XFxVc2Vyc1xcdGVubmlcXE9uZURyaXZlXFxEb2N1bWVudHNcXEdpdEh1Ylxccl93X3Byb2plY3RcXGRhdGFcXGFjb3VzdGljLmNzdiIpDQpgYGANCg0KDQpgYGB7ciwgd2FybmluZz1GQUxTRSwgbWVzc2FnZT1GQUxTRSwgZWNobz1GQUxTRX0NCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShndGhlb3J5KQ0KbGlicmFyeShsbWU0KQ0KbGlicmFyeShjYXIpDQpsaWJyYXJ5KE11TUluKQ0KYGBgDQoNCmBgYHtyfQ0KcncubWVyZ2UgJT4lIA0KICBtdXRhdGUoDQogICAgUi5JbmRpY2F0b3I9MSoodHJhbnNjPT0iciIpLA0KICAgIFIucGx1cy5JbmRpY2F0b3I9MSoodHJhbiAlaW4lIGMoInIiLCAiJHIiLCAiJHI6dyIpKSwgDQogICAgVGFyZ2V0PWFzLmZhY3Rvcih0YXJnZXQpLA0KICAgIFRyYW5zY3JpcHRpb249YXMuZmFjdG9yKHRyYW5zYyksDQogICAgUmF0ZXI9YXMuZmFjdG9yKExpc3RlbmVyKSwgDQogICAgQ2hpbGQ9YXMuZmFjdG9yKHN1YmplY3QpLA0KICAgIFdvcmQ9YXMuZmFjdG9yKHdvcmQueCkNCiAgKSAlPiUNCiAgc2VsZWN0KA0KICAgIHJhdGluZywgDQogICAgUi5JbmRpY2F0b3IsIA0KICAgIFIucGx1cy5JbmRpY2F0b3IsDQogICAgVGFyZ2V0LCANCiAgICBUcmFuc2NyaXB0aW9uLCANCiAgICBSYXRlciwgDQogICAgZjNmMiwgDQogICAgZjMsIA0KICAgIENoaWxkLCANCiAgICBXb3JkDQogICkgJT4lIA0KICBmaWx0ZXIoIWlzLm5hKHJhdGluZykpIC0+IA0KICAgIHJ3LmNsZWFuDQpgYGANCg0KIyBMb2cgQmlub21pYWwgTWl4ZWQgRWZmZWN0cyBNb2RlbCBmb3IgVHJhbnNjcmlwdGlvbiBvZiAvUi8gYnkgRjNmMg0KDQpgYGB7cn0NCnIuZ2xtZXIubG9nYmluLm1kbC5iYXNlIDwtIGdsbWVyKA0KICBSLkluZGljYXRvciB+IA0KICAgIEkoc2NhbGUoZjNmMikpICsgKDF8Q2hpbGQpDQogICwgDQogIGRhdGEgPSBydy5jbGVhbiwNCiAgZmFtaWx5ID0gcG9pc3NvbihsaW5rPSJsb2ciKQ0KKQ0KDQojIFR5cGUgMyBTUw0KQW5vdmEoci5nbG1lci5sb2diaW4ubWRsLmJhc2UsVHlwZT0iSUlJIikNCg0KDQojIHJlZ3Jlc3Npb24gY29lZmZpY2llbnRzDQpzdW1tYXJ5KHIuZ2xtZXIubG9nYmluLm1kbC5iYXNlKQ0Kci5zcXVhcmVkR0xNTShyLmdsbWVyLmxvZ2Jpbi5tZGwuYmFzZSkNCnIuc3F1YXJlZExSKHIuZ2xtZXIubG9nYmluLm1kbC5iYXNlKQ0KYGBgDQoNCiMgTG9nIEJpbm9taWFsIE1peGVkIEVmZmVjdHMgTW9kZWwgZm9yIFRyYW5zY3JpcHRpb24gb2YgL1IvIGJ5IFJhdGluZw0KDQpgYGB7cn0NCnIuZ2xtZXIubG9nYmluLm1kbC5yYXRpbmcgPC0gZ2xtZXIoDQogIFIuSW5kaWNhdG9yIH4gDQogICAgcmF0aW5nICsgKDF8Q2hpbGQpDQogICwgDQogIGRhdGEgPSBydy5jbGVhbiwNCiAgZmFtaWx5ID0gcG9pc3NvbihsaW5rPSJsb2ciKQ0KKQ0KDQojIFR5cGUgMyBTUw0KQW5vdmEoci5nbG1lci5sb2diaW4ubWRsLnJhdGluZyxUeXBlPSJJSUkiKQ0KDQoNCiMgcmVncmVzc2lvbiBjb2VmZmljaWVudHMNCnN1bW1hcnkoci5nbG1lci5sb2diaW4ubWRsLnJhdGluZykNCnIuc3F1YXJlZEdMTU0oci5nbG1lci5sb2diaW4ubWRsLnJhdGluZykNCnIuc3F1YXJlZExSKHIuZ2xtZXIubG9nYmluLm1kbC5yYXRpbmcpDQpgYGANCg0KDQojIExpbmVhciBNaXhlZCBFZmZlY3RzIE1vZGVsIGZvciBSYXRpbmdzDQpgYGB7cn0NCmxtZXIoZGF0YSA9IHJ3Lmd0LCBmb3JtdWxhID0gInJhdGluZyB+IGYzZjIgKyAoMXxDaGlsZCkiKSAtPiBydy5NRW1vZGVsDQpzdW1tYXJ5KHJ3Lk1FbW9kZWwpDQpyLnNxdWFyZWRMUihydy5NRW1vZGVsKQ0KYGBgDQoNCiMgRyBUaGVvcnkNCmBgYHtyfQ0KZ3RoZW9yeTo6Z3N0dWR5KGRhdGEgPSBydy5jbGVhbiwgZm9ybXVsYSA9ICJyYXRpbmcgfiBmM2YyICsgKDF8UmF0ZXIpICsgKDF8Q2hpbGQpIikNCmBgYA0KDQpgYGB7cn0NCmd0aGVvcnk6OmdzdHVkeShkYXRhID0gcncuY2xlYW4sIGZvcm11bGEgPSAiUi5JbmRpY2F0b3IgfiBmM2YyICsgKDF8UmF0ZXIpICsgKDF8Q2hpbGQpIikNCmBgYA0KDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCnJ3Lm1lcmdlIDwtIHJlYWQuY3N2KCJDOlxcVXNlcnNcXHRlbm5pXFxPbmVEcml2ZVxcRG9jdW1lbnRzXFxHaXRIdWJcXHJfd19wcm9qZWN0XFxkYXRhXFxyd19tZXJnZS5jc3YiKQ0KYWNvdXMgPC0gcmVhZC5jc3YoIkM6XFxVc2Vyc1xcdGVubmlcXE9uZURyaXZlXFxEb2N1bWVudHNcXEdpdEh1Ylxccl93X3Byb2plY3RcXGRhdGFcXGFjb3VzdGljLmNzdiIpDQpgYGANCg0KDQpgYGB7ciwgd2FybmluZz1GQUxTRSwgbWVzc2FnZT1GQUxTRSwgZWNobz1GQUxTRX0NCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShndGhlb3J5KQ0KbGlicmFyeShsbWU0KQ0KbGlicmFyeShjYXIpDQpsaWJyYXJ5KE11TUluKQ0KYGBgDQoNCmBgYHtyfQ0KcncubWVyZ2UgJT4lIA0KICBtdXRhdGUoDQogICAgUi5JbmRpY2F0b3I9MSoodHJhbnNjPT0iciIpLA0KICAgIFIucGx1cy5JbmRpY2F0b3I9MSoodHJhbiAlaW4lIGMoInIiLCAiJHIiLCAiJHI6dyIpKSwgDQogICAgVGFyZ2V0PWFzLmZhY3Rvcih0YXJnZXQpLA0KICAgIFRyYW5zY3JpcHRpb249YXMuZmFjdG9yKHRyYW5zYyksDQogICAgUmF0ZXI9YXMuZmFjdG9yKExpc3RlbmVyKSwgDQogICAgQ2hpbGQ9YXMuZmFjdG9yKHN1YmplY3QpLA0KICAgIFdvcmQ9YXMuZmFjdG9yKHdvcmQueCkNCiAgKSAlPiUNCiAgc2VsZWN0KA0KICAgIHJhdGluZywgDQogICAgUi5JbmRpY2F0b3IsIA0KICAgIFIucGx1cy5JbmRpY2F0b3IsDQogICAgVGFyZ2V0LCANCiAgICBUcmFuc2NyaXB0aW9uLCANCiAgICBSYXRlciwgDQogICAgZjNmMiwgDQogICAgZjMsIA0KICAgIENoaWxkLCANCiAgICBXb3JkDQogICkgJT4lIA0KICBmaWx0ZXIoIWlzLm5hKHJhdGluZykpIC0+IA0KICAgIHJ3LmNsZWFuDQpgYGANCg0KIyBMb2cgQmlub21pYWwgTWl4ZWQgRWZmZWN0cyBNb2RlbCBmb3IgVHJhbnNjcmlwdGlvbiBvZiAvUi8gYnkgRjNmMg0KDQpgYGB7cn0NCnIuZ2xtZXIubG9nYmluLm1kbC5iYXNlIDwtIGdsbWVyKA0KICBSLkluZGljYXRvciB+IA0KICAgIEkoc2NhbGUoZjNmMikpICsgKDF8Q2hpbGQpDQogICwgDQogIGRhdGEgPSBydy5jbGVhbiwNCiAgZmFtaWx5ID0gcG9pc3NvbihsaW5rPSJsb2ciKQ0KKQ0KDQojIFR5cGUgMyBTUw0KQW5vdmEoci5nbG1lci5sb2diaW4ubWRsLmJhc2UsVHlwZT0iSUlJIikNCg0KDQojIHJlZ3Jlc3Npb24gY29lZmZpY2llbnRzDQpzdW1tYXJ5KHIuZ2xtZXIubG9nYmluLm1kbC5iYXNlKQ0Kci5zcXVhcmVkR0xNTShyLmdsbWVyLmxvZ2Jpbi5tZGwuYmFzZSkNCnIuc3F1YXJlZExSKHIuZ2xtZXIubG9nYmluLm1kbC5iYXNlKQ0KYGBgDQoNCiMgTG9nIEJpbm9taWFsIE1peGVkIEVmZmVjdHMgTW9kZWwgZm9yIFRyYW5zY3JpcHRpb24gb2YgL1IvIGJ5IFJhdGluZw0KDQpgYGB7cn0NCnIuZ2xtZXIubG9nYmluLm1kbC5yYXRpbmcgPC0gZ2xtZXIoDQogIFIuSW5kaWNhdG9yIH4gDQogICAgcmF0aW5nICsgKDF8Q2hpbGQpICsgKDF8UmF0ZXIpDQogICwgDQogIGRhdGEgPSBydy5jbGVhbiwNCiAgZmFtaWx5ID0gcG9pc3NvbihsaW5rPSJsb2ciKQ0KKQ0KDQojIFR5cGUgMyBTUw0KQW5vdmEoci5nbG1lci5sb2diaW4ubWRsLnJhdGluZyxUeXBlPSJJSUkiKQ0KDQoNCiMgcmVncmVzc2lvbiBjb2VmZmljaWVudHMNCnN1bW1hcnkoci5nbG1lci5sb2diaW4ubWRsLnJhdGluZykNCnIuc3F1YXJlZEdMTU0oci5nbG1lci5sb2diaW4ubWRsLnJhdGluZykNCnIuc3F1YXJlZExSKHIuZ2xtZXIubG9nYmluLm1kbC5yYXRpbmcpDQpgYGANCg0KDQojIExpbmVhciBNaXhlZCBFZmZlY3RzIE1vZGVsIGZvciBSYXRpbmdzDQpgYGB7cn0NCmxtZXIoZGF0YSA9IHJ3Lmd0LCBmb3JtdWxhID0gInJhdGluZyB+IGYzZjIgKyAoMXxDaGlsZCkiKSAtPiBydy5NRW1vZGVsDQpzdW1tYXJ5KHJ3Lk1FbW9kZWwpDQpyLnNxdWFyZWRMUihydy5NRW1vZGVsKQ0KYGBgDQoNCiMgRyBUaGVvcnkNCmBgYHtyfQ0KZ3RoZW9yeTo6Z3N0dWR5KGRhdGEgPSBydy5jbGVhbiwgZm9ybXVsYSA9ICJyYXRpbmcgfiBmM2YyICsgKDF8UmF0ZXIpICsgKDF8Q2hpbGQpIikNCmBgYA0KDQpgYGB7cn0NCmd0aGVvcnk6OmdzdHVkeShkYXRhID0gcncuY2xlYW4sIGZvcm11bGEgPSAiUi5JbmRpY2F0b3IgfiBmM2YyICsgKDF8UmF0ZXIpICsgKDF8Q2hpbGQpIikNCmBgYA0KYGBge3J9DQpndGhlb3J5Ojpnc3R1ZHkoZGF0YSA9IHJ3LmNsZWFuLCBmb3JtdWxhID0gIlIuSW5kaWNhdG9yIH4gcmF0aW5nICsgKDF8UmF0ZXIpICsgKDF8Q2hpbGQpIikNCmBgYA0KDQo=</div>
 
 
 

@@ -70,7 +70,7 @@ r.squaredLR(r.glmer.logbin.mdl.base)
 ```{r}
 r.glmer.logbin.mdl.rating <- glmer(
   R.Indicator ~ 
-    rating + (1|Child)
+    rating + (1|Child) + (1|Rater)
   , 
   data = rw.clean,
   family = poisson(link="log")
@@ -102,5 +102,7 @@ gtheory::gstudy(data = rw.clean, formula = "rating ~ f3f2 + (1|Rater) + (1|Child
 ```{r}
 gtheory::gstudy(data = rw.clean, formula = "R.Indicator ~ f3f2 + (1|Rater) + (1|Child)")
 ```
-
+```{r}
+gtheory::gstudy(data = rw.clean, formula = "R.Indicator ~ rating + (1|Rater) + (1|Child)")
+```
 
