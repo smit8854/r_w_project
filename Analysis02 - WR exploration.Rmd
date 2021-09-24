@@ -160,6 +160,18 @@ No. It seems age is only helpful when considering within subject development, no
 
 ## F3F2 distance and Rating
 
+Is F3F2 distance distinct by transcription? 
+```{r}
+ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("r", "w"))), aes(x=f3f2, color=tran))+geom_density(size=2)+
+  scale_colour_manual(values=cbPalette) + theme_tufte() 
+```
+
+
+```{r}
+ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("$r", "r", "$w", "w"))), aes(x=f3f2, color=tran))+geom_density(size=2)+
+  scale_colour_manual(values=cbPalette) + theme_tufte() 
+```
+
 Contour plots for f3f2 distance and rating by transcription. 
 
 We're expecting ratings to change as f3f2 changes, i.e., some non-zero slope on the central axis.
