@@ -1,0 +1,276 @@
+---
+title: "RW Initial Processing"
+output: html_notebook
+---
+
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+
+# Import Files
+
+```{r}
+vas <- read.csv("data\\raw_rw_data.csv")
+```
+one record per rater per sound
+
+
+```{r}
+acous <- read.csv("data\\raw_acoustic_data.csv")
+```
+one record per child per sound
+
+
+
+```{r}
+vowel <- read.csv("data\\target_words_vowel_type.csv")
+```
+vowel info
+
+
+```{r}
+triple <- read.csv("data\\RW_triple_tracker.csv")
+```
+triple tracker thing with Eugene
+theoretically the onset and qrtr are most indicative of the /r/. As you get further along, you start transitioning into the vowel. 
+theoretically, its the onset. 
+
+
+
+
+## Initial processing
+
+triple tracker, create the f3f2 distance
+```{r}
+triple_formerge <- triple %>% 
+  mutate(
+    f3f2onset = f3_onset_med - f2_onset_med,
+    f3f2qrtr = f3_qrtr_med - f2_qrtr_med,
+    ChildWordKey = paste(str_pad(spkr,3,pad="0"),"L",age_mos,gender,session,"Test",testnumber,word, sep="")
+  ) %>% 
+  select(f3f2onset, f3f2qrtr, ChildWordKey)
+```
+
+
+rename columns that R/we messed up somewhere
+```{r}
+names(vas)[1] <- "ExperimentName"
+names(vas)[2] <- "Version"
+
+names(vas)[which(names(vas)=="Subject")] <- "Listener"
+
+names(acous)=c("sound", "word", "test", "tran", "timeLab", "f1", "f2", "f3", "f3f2")
+```
+
+
+
+
+create ChildWordKey in vas
+```{r}
+vas.orig <- vas
+
+vas <- vas.orig %>% mutate(ChildWordKey = sub("\\_.*", "", Filename))
+```
+
+
+create ChildWordKey in acous
+```{r}
+acous.orig  <- acous
+
+acous <- acous.orig %>% 
+  mutate(ChildID = sub(".*_", "", sound)) %>% #creates the ChildID
+    mutate(., ChildWordKey = paste(ChildID, test, word, sep="")) # concatenates Child, Test, and Word
+```
+
+
+
+standardize f3f2 per child
+```{r}
+acous.orig <- acous #save original important in separate table
+
+acous <- acous.orig %>% 
+  group_by(ChildID) %>% 
+  mutate(f3f2norm = scale(f3f2))
+```
+
+
+merge vowel with acous
+```{r}
+acous.vowel <- merge(
+  acous, vowel,
+  by = c("word"),
+  all=TRUE
+)
+
+orig.acous <- acous
+acous <- acous.vowel
+```
+
+export cleaned acoustic file
+```{r}
+write.csv(acous, file=file.choose())
+```
+
+
+
+Check file characteristics
+```{r}
+dim(vas)
+dim(acous)
+
+names(vas)
+names(acous)
+
+head(acous)
+head(vas)
+```  
+
+
+## Unique IDs
+
+### Children
+
+Verify child ID. Remember, the ChildIDs are not on the original file, they were made in excel. consider trying to pull that off in R. or at the least, verify it's been done correctly ...
+
+First, make sure each unique sound ID has the correct child ID.
+```{r}
+(acous %>% select(sound, ChildID) %>% distinct())
+```
+There are 136 total kids. Looks good. 
+
+
+Second, make there are no missing childIDs.
+```{r}
+sum(is.na(acous$ChildID))
+```
+w00t.
+
+
+
+### Adults
+
+```{r}
+table(vas$Listener)
+dim(table(vas$Listener))
+
+sum(is.na(vas$Listener))
+
+vas %>% select(Listener) %>% distinct()
+```
+
+132 adult listeners each getting approx 500 stims. + no missing. 
+
+should be 142 ... 102 from minn and 30 from wisc ??
+
+
+```{r}
+table(vas$ChildID)
+dim(table(vas$ChildID))
+sum(is.na(vas$ChildID))
+```
+148 kids ??? thought there were only 136... there should only be 136
+
+```{r}
+vas %>% select(ChildID) %>% distinct()
+acous %>% select(ChildID) %>% distinct()
+```
+Kids 17 and 22 are faux? 
+
+```{r}
+vas %>% filter(ChildID=="017L") %>% select(ChildID, Age, sex, Filename, ChildWordKey, )
+```
+
+```{r}
+table((vas %>% select(ChildID, include) %>% distinct())$include)
+```
+
+## Notes
+
+sooooooo whatever the include var is, that should match up the kids between VAS and acous. 
+
+
+# Merge
+
+
+what is this -> ? 
+```{r}
+#verify we've got all the same kids
+cbind(
+  vas %>% filter(include == "yes") %>% select(ChildWordKey) %>% distinct(),
+  acous %>% select(ChildWordKey) %>% distinct()
+)
+```
+
+```{r}
+rw.merge.part1 <- merge(
+  (vas %>% filter(include=="yes")),acous,
+  by = c("ChildWordKey"),
+  all=FALSE
+)
+dim(rw.merge.part1)
+rw.merge.tt <- merge(
+  rw.merge.part1, triple_formerge,
+  by = c("ChildWordKey"),
+  all=FALSE
+)
+dim(rw.merge.tt)
+```
+What's up with those missin kids and what not on the files etc? Child 8. 
+
+
+```{r}
+dim(rw.merge); dim(vas %>% filter(include=="yes"))
+head(rw.merge)
+sum(is.na(rw.merge$sound))
+```
+
+
+wtf! why are dim rw.merge and dim vas not equal?
+
+```{r}
+# list of child+words that are on VAS but not acoustic file
+
+rw.merge %>% filter(is.na(sound)) %>% select(ChildWordKey) %>% distinct()
+```
+
+
+```{r}
+acous %>% filter(ChildID == "C006")
+```
+Kid 6 didn't say window ...
+
+```{r}
+vas%>% filter(ChildID == "C006", word=="window")
+```
+ ... but we've got listeners who have rated kid 6 saying window. 
+
+
+
+```{r}
+acous %>% filter(ChildID %in% (
+  rw.merge %>% filter(is.na(sound)) %>% select(ChildWordKey) %>% distinct()
+  )
+)
+```
+as expected, no acous data for some childwordkeys. 
+
+
+need to go search PRAAT for kid 6 saying window. 
+
+implications for R. The merge is fine, exclude the 12 mysterious kids from VAS before merge. previous analyses stand. 
+
+save as CSV
+```{r}
+write.csv(rw.merge, file=file.choose())
+```
+
+
+save as CSV
+```{r}
+write.csv(rw.merge.tt, file=file.choose())
+```

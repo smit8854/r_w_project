@@ -5,8 +5,7 @@ output: html_notebook
 
 # Input
 ```{r}
-rw.merge <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\rw_merge.csv")
-acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\acoustic.csv")
+rw.merge.tt <- read.csv("data\\rw_merge_tt.csv")
 ```
 
 child age
@@ -95,11 +94,11 @@ ggplot(
 ## scaled f2f3 by transcription
 ```{r}
 ggplot(
-  data=(acous %>% filter(
+  data=(rw.merge.tt %>% filter(
     #ChildID == unique(acous$ChildID)[22], 
     tran == c("w", "r")
   )), 
-  aes(x=f3f2norm, color=tran)
+  aes(x=f3f2onset, color=tran)
 ) + 
   geom_density() + 
     scale_colour_manual(values=cbPalette) + theme_tufte()
@@ -161,8 +160,8 @@ No. It seems age is only helpful when considering within subject development, no
 Is Rating related to F3F2? 
 ```{r}
 ggplot(
-  data=rw.merge, 
-  aes(x=f3f2, y=rating)
+  data=rw.merge.tt, 
+  aes(x=f3f2onset, y=rating)
 ) + 
   theme_tufte()+
   geom_point(col="gray", alpha=.2)+
@@ -176,8 +175,8 @@ ggplot(
 Is F3F2 distance distinct by transcription? 
 ```{r}
 ggplot(
-  data=(rw.merge %>% filter(!is.na(target), tran == c("r", "w"))), 
-  aes(x=f3f2, color=tran))+geom_density(size=2)+
+  data=(rw.merge.tt %>% filter(!is.na(target), tran == c("r", "w"))), 
+  aes(x=f3f2onset, color=tran))+geom_density(size=2)+
 scale_colour_manual(name = "Transcription", values=c("#7a0019", "#ffcc33")) + 
 scale_y_continuous(breaks=NULL, name=NULL) +
 scale_x_continuous(breaks=seq(0,3000,500), name="F3F2 Distance") +
@@ -194,7 +193,7 @@ theme_tufte()
 
 
 ```{r}
-ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("$r", "r", "$w", "w"))), aes(x=f3f2, color=tran))+geom_density(size=2)+
+ggplot(data=(rw.merge.tt %>% filter(!is.na(target), tran == c("$r", "r", "$w", "w"))), aes(x=f3f2onset, color=tran))+geom_density(size=2)+
   scale_colour_manual(values=cbPalette) + theme_tufte() 
 ```
 
@@ -203,22 +202,22 @@ Contour plots for f3f2 distance and rating by transcription.
 We're expecting ratings to change as f3f2 changes, i.e., some non-zero slope on the central axis.
 
 ```{r}
-p1=ggplot(data=(rw.merge %>% filter(transc=="w")), aes(y=f3f2, x=rating)) + 
+p1=ggplot(data=(rw.merge.tt %>% filter(transc=="w")), aes(y=f3f2onset, x=rating)) + 
   labs(title="w") + 
   geom_density_2d() + 
   scale_y_continuous(limits=c(500,3000))
 
-p2=ggplot(data=(rw.merge  %>% filter(transc=="r")), aes(y=f3f2, x=rating)) + 
+p2=ggplot(data=(rw.merge.tt  %>% filter(transc=="r")), aes(y=f3f2onset, x=rating)) + 
   labs(title="r") + 
   geom_density_2d() + 
   scale_y_continuous(limits=c(500,3000))
 
-p3=ggplot(data=(rw.merge  %>% filter(transc=="rw")), aes(y=f3f2, x=rating)) + 
+p3=ggplot(data=(rw.merge.tt  %>% filter(transc=="rw")), aes(y=f3f2onset, x=rating)) + 
   labs(title="rw") + 
   geom_density_2d() + 
   scale_y_continuous(limits=c(500,3000))
 
-p4=ggplot(data=(rw.merge  %>% filter(transc=="wr")), aes(y=f3f2, x=rating)) + 
+p4=ggplot(data=(rw.merge.tt  %>% filter(transc=="wr")), aes(y=f3f2onset, x=rating)) + 
   labs(title="wr") + 
   geom_density_2d() + 
   scale_y_continuous(limits=c(500,3000))
@@ -230,10 +229,10 @@ All these center axes look horizontal .... f3f2 isn't related to rating? Perhaps
 
 plot contours of ratings that are strictly r and w to look at f3f2 diff
 ```{r}
-rw.merge %>% 
+rw.merge.tt %>% 
   filter(transc == "r" & rating < 0.125 | transc == "w" & rating > 0.875) %>% 
   ggplot() +
-  aes(x = rating, y = f3f2) +
+  aes(x = rating, y = f3f2onset) +
   geom_density_2d() +
   scale_y_continuous(limits=c(500,3000)) +
   scale_colour_manual(values=cbPalette) + theme_tufte() +
