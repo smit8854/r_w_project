@@ -158,12 +158,38 @@ ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("$w"))), aes(x=as.fac
 
 No. It seems age is only helpful when considering within subject development, not across all participants in a single time point study. 
 
+Is Rating related to F3F2? 
+```{r}
+ggplot(
+  data=rw.merge, 
+  aes(x=f3f2, y=rating)
+) + 
+  theme_tufte()+
+  geom_point(col="gray", alpha=.2)+
+  geom_smooth(method=lm, lwd=2)+
+  xlab("F3F2 Distance") + ylab("Listener Rating: 0=R 1=W")
+```
+
+
 ## F3F2 distance and Rating
 
 Is F3F2 distance distinct by transcription? 
 ```{r}
-ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("r", "w"))), aes(x=f3f2, color=tran))+geom_density(size=2)+
-  scale_colour_manual(values=cbPalette) + theme_tufte() 
+ggplot(
+  data=(rw.merge %>% filter(!is.na(target), tran == c("r", "w"))), 
+  aes(x=f3f2, color=tran))+geom_density(size=2)+
+scale_colour_manual(name = "Transcription", values=c("#7a0019", "#ffcc33")) + 
+scale_y_continuous(breaks=NULL, name=NULL) +
+scale_x_continuous(breaks=seq(0,3000,500), name="F3F2 Distance") +
+theme_tufte()
+```
+
+```{r}
+ggplot(data=(rw.merge %>% filter(!is.na(target), tran == c("r", "w"))), aes(x=rating, color=tran))+geom_density(size=2)+
+scale_colour_manual(name = "Transcription", values=c("#7a0019", "#ffcc33")) + 
+scale_y_continuous(breaks=NULL, name=NULL) +
+scale_x_continuous(breaks=seq(0,1,.2), name="Listener Rating: 0=R 1=W") +
+theme_tufte()
 ```
 
 
