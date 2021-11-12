@@ -19,6 +19,7 @@ library(dplyr)
 # Prep Workspace ----------------------------------------------------------
 
 dir_data <- "C:\\Users\\Michael\\Documents\\GitHub\\r_w_project\\data"
+#dir_data <- "C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data"
 setwd(dir_data)
 
 vas <- read.csv(file = "VAS.csv")
@@ -237,6 +238,7 @@ rw.merge.tt.f3 = rw.merge.tt.f3 %>%
                              f3mincolshort <= "f3_thrqrtr_med" ~ f3f2thrgrtr,
                              f3mincolshort <= "f3_endpt_med" ~ f3f2endpt))
 
+write.csv(rw.merge.tt.f3, file=file.choose())
 #yay! now we can look at graphs with the f3-f2 distance taken from the point where f3 is lowest and see if they look any different
 
 #duplicated for comparison:
