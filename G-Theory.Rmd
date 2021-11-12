@@ -4,8 +4,8 @@ output: html_notebook
 ---
 
 ```{r}
-rw.merge <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\rw_merge.csv")
-acous <- read.csv("C:\\Users\\tenni\\OneDrive\\Documents\\GitHub\\r_w_project\\data\\acoustic.csv")
+rw.merge <- read.csv("data\\rw_merge.csv")
+acous <- read.csv("data\\acoustic.csv")
 ```
 
 
