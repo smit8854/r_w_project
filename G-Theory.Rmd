@@ -4,8 +4,9 @@ output: html_notebook
 ---
 
 ```{r}
-rw.merge <- read.csv("data\\rw_merge.csv")
+#rw.merge <- read.csv("data\\rw_merge.csv")
 acous <- read.csv("data\\acoustic.csv")
+rw.merge <- read.csv("data\\rw_merge_tt_min.csv")
 ```
 
 
@@ -26,7 +27,7 @@ rw.merge %>%
     Transcription=as.factor(transc),
     Rater=as.factor(Listener), 
     Child=as.factor(subject),
-    Word=as.factor(word.x)
+    Word=as.factor(word)
   ) %>%
   select(
     rating, 
@@ -35,8 +36,8 @@ rw.merge %>%
     Target, 
     Transcription, 
     Rater, 
-    f3f2, 
-    f3, 
+    f3f2,
+    f3f2min, 
     Child, 
     Word
   ) %>% 
@@ -49,19 +50,19 @@ rw.merge %>%
 ```{r}
 r.glmer.logbin.mdl.base <- glmer(
   R.Indicator ~ 
-    I(scale(f3f2)) + (1|Child)
+    I(scale(f3f2min)) + (1|Child)
   , 
   data = rw.clean,
   family = poisson(link="log")
 )
 
 # Type 3 SS
-Anova(r.glmer.logbin.mdl.base,Type="III")
+#Anova(r.glmer.logbin.mdl.base,Type="III")
 
 
 # regression coefficients
-summary(r.glmer.logbin.mdl.base)
-r.squaredGLMM(r.glmer.logbin.mdl.base)
+#summary(r.glmer.logbin.mdl.base)
+#r.squaredGLMM(r.glmer.logbin.mdl.base)
 r.squaredLR(r.glmer.logbin.mdl.base)
 ```
 
@@ -89,20 +90,125 @@ r.squaredLR(r.glmer.logbin.mdl.rating)
 
 # Linear Mixed Effects Model for Ratings
 ```{r}
-lmer(data = rw.gt, formula = "rating ~ f3f2 + (1|Child)") -> rw.MEmodel
-summary(rw.MEmodel)
+lmer(data = rw.clean, formula = "rating ~ f3f2min + (1|Child)") -> rw.MEmodel
+#summary(rw.MEmodel)
 r.squaredLR(rw.MEmodel)
+plot(density(resid(rw.MEmodel)))
 ```
 
 # G Theory
 ```{r}
-gtheory::gstudy(data = rw.clean, formula = "rating ~ f3f2 + (1|Rater) + (1|Child)")
+gtheory::gstudy(data = rw.clean, formula = "rating ~ f3f2min + (1|Rater) + (1|Child)")
 ```
 
 ```{r}
-gtheory::gstudy(data = rw.clean, formula = "R.Indicator ~ f3f2 + (1|Rater) + (1|Child)")
+gtheory::gstudy(data = rw.clean, formula = "R.Indicator ~ f3f2min + (1|Rater) + (1|Child)")
 ```
 ```{r}
 gtheory::gstudy(data = rw.clean, formula = "R.Indicator ~ rating + (1|Rater) + (1|Child)")
 ```
 
+# Cohen's D
+
+Per Child, VAS ~ Target, get cohen's d
+```{r}
+library(psych)
+
+child.list <- rw.merge %>% select(subject) %>% distinct() 
+rw.cohens.d.child = {}
+for (i in 1:length(child.list$subject)){
+  rw.cohens.d.child[i] <- 
+  cohen.d(
+    (rw.merge %>% filter(subject==child.list$subject[i]) %>% 
+    select(rating, target)), "target")$cohen.d[2] 
+}
+```
+
+
+describe it
+```{r}
+describe(rw.cohens.d.child)
+```
+
+plot it
+```{r}
+ggplot(data=data.frame(rw.cohens.d.child), aes(x=rw.cohens.d.child)) + 
+  geom_density()
+```
+only /w/ and /wr/
+```{r}
+library(psych)
+
+childlist.w.wr <- rw.merge %>% 
+  filter(transc %in% c("w", "wr")) %>% 
+  group_by(subject, transc) %>% 
+  summarise(n=n()) %>% 
+  spread(transc, n) %>% 
+  filter(w>2 & wr>2) %>% 
+  select(subject)
+
+rw.merge.w.wr.d <- rw.merge %>% 
+  filter(subject %in% childlist.w.wr$subject) %>%
+  filter(transc %in% c("w", "wr")) %>% 
+  group_by(subject, target) %>%
+  summarise(
+    mean=mean(rating),
+    sd=sd(rating),
+    n=n()
+  ) 
+
+
+wide.form <- rw.merge.w.wr.d %>% 
+  pivot_wider(names_from=target, values_from=c(mean,sd,n))
+
+rw.d <- wide.form %>% filter(n_w>3 & n_r>3) %>%
+  mutate(d=(mean_w - mean_r)/(sqrt(((sd_w**2)/n_w)+((sd_r**2)/n_r))))
+```
+
+plot it
+```{r}
+ggplot(data=rw.d, aes(x=d)) + 
+  geom_density()
+#+xlim(0,7.5)
+
+describe(rw.d)
+```
+
+only /w/ and /wr/ but f3f2min
+```{r}
+library(psych)
+
+childlist.w.wr <- rw.merge %>% 
+  filter(transc %in% c("w", "wr")) %>% 
+  group_by(subject, transc) %>% 
+  summarise(n=n()) %>% 
+  spread(transc, n) %>% 
+  filter(w>2 & wr>2) %>% 
+  select(subject)
+
+rw.merge.w.wr.d <- rw.merge %>% 
+  filter(subject %in% childlist.w.wr$subject) %>%
+  filter(transc %in% c("w", "wr")) %>% 
+  group_by(subject, target) %>%
+  summarise(
+    mean=mean(f3f2min),
+    sd=sd(f3f2min),
+    n=n()
+  ) 
+
+
+wide.form <- rw.merge.w.wr.d %>% 
+  pivot_wider(names_from=target, values_from=c(mean,sd,n))
+
+rw.d <- wide.form %>% filter(n_w>3 & n_r>3) %>%
+  mutate(d=(mean_w - mean_r)/(sqrt(((sd_w**2)/n_w)+((sd_r**2)/n_r))))
+```
+
+plot it
+```{r}
+ggplot(data=rw.d, aes(x=d)) + 
+  geom_density()
+#+xlim(0,7.5)
+
+describe(rw.d)
+```
