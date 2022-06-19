@@ -22,6 +22,7 @@ library(MuMIn)
 rw.merge %>% 
   mutate(
     R.Indicator=1*(transc=="r"),
+    R.Indicator.collapsed=1*(transc %in% c("r", "rw")),
     R.plus.Indicator=1*(tran %in% c("r", "$r", "$r:w")), 
     Target=as.factor(target),
     Transcription=as.factor(transc),
@@ -32,6 +33,7 @@ rw.merge %>%
   select(
     rating, 
     R.Indicator, 
+    R.Indicator.collapsed,
     R.plus.Indicator,
     Target, 
     Transcription, 
@@ -49,8 +51,8 @@ rw.merge %>%
 
 ```{r}
 r.glmer.logbin.mdl.base <- glmer(
-  R.Indicator ~ 
-    I(scale(f3f2min)) + (1|Child)
+  R.Indicator.collapsed ~ 
+    f3f2min + (1|Child)
   , 
   data = rw.clean,
   family = poisson(link="log")
